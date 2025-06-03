@@ -2,3 +2,4 @@
 node_modules/
 used_news.json
 outputs/
+coverage/
