@@ -39,19 +39,30 @@ jobs:
         id: coverage
         run: |
           if [ -f ./coverage/coverage-summary.json ]; then
-            COVERAGE=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
+            COVERAGE=$(node -e "console.log(Math.round(require('./coverage/coverage-summary.json').total.lines.pct || 0))")
           else
             COVERAGE=0
           fi
+          # Define cor do badge
+          if [ "$COVERAGE" -ge 80 ]; then
+            BADGE_COLOR=brightgreen
+          elif [ "$COVERAGE" -ge 50 ]; then
+            BADGE_COLOR=yellow
+          else
+            BADGE_COLOR=red
+          fi
           echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+          echo "BADGE_COLOR=$BADGE_COLOR" >> $GITHUB_ENV
       - name: Update README coverage badge
         run: |
-          COVERAGE="${COVERAGE:-0}"
-          sed -i '/^![Coverage]/Id' README.md
-          sed -i "2i ![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-brightgreen.svg)" README.md
-          cat README.md | head -10
+          # Remove todas as linhas com badge de coverage
+          sed -i '/coverage-.*%25-.*\.svg)/Id' README.md
+          # Adiciona na segunda linha
+          sed -i "2i ![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${BADGE_COLOR}.svg)" README.md
+          head -10 README.md
         env:
           COVERAGE: ${{ env.COVERAGE }}
+          BADGE_COLOR: ${{ env.BADGE_COLOR }}
       - name: Commit badge if changed
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
