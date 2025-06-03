@@ -37,7 +37,13 @@ export async function main() {
     for (const news of topNews) {
         logger.info(`Título: ${news.title}\nResumo IA: ${news.summary}\nImpacto IA: ${news.impact_reason}\n---`);
         // Marca como usada (salva no MongoDB ou JSON local)
-        await markNewsAsUsed(news);
+        // Garante que o campo link seja preservado
+        const original = filteredNews.find(n => n.title === news.title);
+        const newsToSave = {
+            ...news,
+            link: original ? original.link : (news.link || '')
+        };
+        await markNewsAsUsed(newsToSave);
     }
     // Salva outputs em arquivos
     const outDir = path.resolve(process.cwd(), 'outputs');

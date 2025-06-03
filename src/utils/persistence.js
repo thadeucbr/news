@@ -46,10 +46,14 @@ export async function markNewsAsUsed(news) {
   } else {
     let data = [];
     try {
-      data = JSON.parse(await fs.readFile(USED_NEWS_FILE, 'utf-8'));
+      // Sempre lê o arquivo atualizado antes de adicionar
+      const fileContent = await fs.readFile(USED_NEWS_FILE, 'utf-8');
+      data = JSON.parse(fileContent);
     } catch {}
+    // Garante que não há duplicidade pelo link
     if (!data.find(n => n.link === news.link)) {
       data.push(news);
+      // Escreve o array completo de volta
       await fs.writeFile(USED_NEWS_FILE, JSON.stringify(data, null, 2));
     }
   }
