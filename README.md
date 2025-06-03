@@ -26,6 +26,7 @@ news/
 │   │   └── llmProviderFactory.js
 │   └── utils/
 │       ├── logger.js           # Logger padronizado
+│       ├── persistence.js      # Persistência de notícias usadas (MongoDB ou JSON)
 │       └── rssParser.js        # (Opcional) Utilitário para parse RSS
 ```
 
@@ -38,9 +39,32 @@ news/
    - Roteiro dinâmico para YouTube Short
 4. Exibe tudo no console (ou pode ser adaptado para salvar/compartilhar).
 
+## Persistência de Notícias Utilizadas
+
+O projeto permite evitar o reuso de notícias já processadas, com duas opções de persistência:
+
+- **Local (JSON):** padrão, salva em `used_news.json` na raiz do projeto.
+- **MongoDB:** para uso compartilhado ou em produção.
+
+Configure no `.env`:
+
+```env
+# Persistência local (JSON)
+USED_NEWS_STORAGE=local
+
+# Persistência em MongoDB
+# USED_NEWS_STORAGE=mongo
+# MONGODB_URI=mongodb://localhost:27017
+# MONGODB_DB=news
+# MONGODB_COLLECTION=used_news
+```
+
+Se `USED_NEWS_STORAGE` não for definido, o padrão é local (JSON).
+
 ## Como Rodar
 
 ### Pré-requisitos
+
 - Node.js **22 ou superior** (obrigatório)
 - Chave da API do provedor LLM desejado (OpenAI, Gemini, Ollama, etc)
 
@@ -97,6 +121,7 @@ Para adicionar novos provedores, crie um arquivo em `src/providers/` seguindo o 
 - Adicione novas fontes RSS em `src/services/newsService.js`.
 - Ajuste prompts e formatos em `src/services/llmService.js`.
 - Adapte para salvar em arquivos, enviar por e-mail, etc.
+- Configure a quantidade de notícias impactantes com `TOP_NEWS_COUNT` no `.env`.
 
 ## Boas Práticas
 
