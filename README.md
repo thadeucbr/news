@@ -1,8 +1,7 @@
 # News Automation AI
-![Coverage](https://img.shields.io/badge/coverage-0%25-brightgreen.svg)
 
 ![Build](https://img.shields.io/github/actions/workflow/status/thadeucbr/news/ci.yml?branch=main)
-![Coverage](https://img.shields.io/codecov/c/github/thadeucbr/news?token=)
+![Coverage](https://img.shields.io/badge/coverage-0%25-brightgreen.svg)
 ![Tests](https://img.shields.io/badge/tests-PASS-brightgreen.svg)
 
 Automação de curadoria de notícias semanais sobre Inteligência Artificial e Desenvolvimento de Software, com geração de artigo para LinkedIn e roteiro para YouTube Short usando LLMs (OpenAI, Gemini, Ollama, etc).
