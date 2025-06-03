@@ -1,5 +1,5 @@
 import { fetchWeeklyNews } from './services/newsService.js';
-import { getTop5ImpactfulNews, generateLinkedInArticle, generateYouTubeShortScript } from './services/llmService.js';
+import { getTopImpactfulNews, generateLinkedInArticle, generateYouTubeShortScript } from './services/llmService.js';
 import { logger } from './utils/logger.js';
 
 export async function main() {
@@ -10,7 +10,7 @@ export async function main() {
         return;
     }
     logger.info(`\n--- ${newsItems.length} Notícias da Semana Encontradas ---`);
-    const topNews = await getTop5ImpactfulNews(newsItems);
+    const topNews = await getTopImpactfulNews(newsItems);
     if (!topNews || topNews.length === 0) {
         logger.info("Não foi possível identificar notícias impactantes ou a IA não retornou resultados. Encerrando geração de conteúdo.");
         return;

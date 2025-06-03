@@ -29,15 +29,16 @@ export async function callLLM(messages, options = {}) {
   return provider.chat(messages, options);
 }
 
-export async function getTop5ImpactfulNews(newsItems) {
+export async function getTopImpactfulNews(newsItems) {
   logger.info("Analisando notícias com LLM para selecionar as mais impactantes...");
   if (!newsItems || newsItems.length === 0) {
     logger.info("Nenhuma notícia fornecida para análise.");
     return [];
   }
+  const topCount = parseInt(process.env.TOP_NEWS_COUNT, 10) || 5;
   const newsForPrompt = newsItems.map(n => `- Título: ${n.title}\n  Fonte: ${n.source}\n  Data: ${n.date}\n  Link: ${n.link}\n  Resumo Coletado: ${n.summary}`).join("\n\n---\n\n");
   const systemPrompt = `Você é um analista de mercado experiente, especializado em Inteligência Artificial e Desenvolvimento de Software. Sua tarefa é identificar as notícias mais impactantes.`;
-  const userPrompt = `\n        Analise a seguinte lista de notícias recentes (da última semana):\n        ${newsForPrompt}\n\n        Com base na sua análise crítica, identifique até 5 (cinco) notícias que você considera as MAIS IMPACTANTES para o mercado e para profissionais da área.\n        Para cada notícia selecionada, forneça:\n        1. O título original da notícia.\n        2. Um breve resumo (1-2 frases concisas) DO CONTEÚDO PRINCIPAL da notícia, elaborado por você.\n        3. Uma justificativa clara e concisa do porquê ela é impactante (ex: potencial de disrupção no mercado, avanço tecnológico significativo, implicações éticas amplas, grande número de desenvolvedores ou empresas afetadas, mudança de paradigma, etc.).\n\n        Priorize notícias com impacto direto e tangível. Evite notícias muito especulativas ou com baixo impacto prático imediato.\n        Se não houver 5 notícias claramente impactantes, retorne menos de 5, mas apenas aquelas que realmente se destacam. Se nenhuma notícia for considerada impactante, retorne uma lista vazia.\n\n        A resposta DEVE ser um objeto JSON contendo uma única chave \"top_news\", que é um array de objetos. Cada objeto deve ter as chaves \"title\", \"summary\", e \"impact_reason\".\n        Exemplo de formato de saída:\n        {\n          \"top_news\": [\n            {\n              \"title\": \"Título da Notícia 1\",\n              \"summary\": \"Resumo elaborado da notícia 1.\",\n              \"impact_reason\": \"Justificativa do impacto da notícia 1.\"\n            }\n          ]\n        }\n    `;
+  const userPrompt = `\n        Analise a seguinte lista de notícias recentes (da última semana):\n        ${newsForPrompt}\n\n        Com base na sua análise crítica, identifique até ${topCount} notícias que você considera as MAIS IMPACTANTES para o mercado e para profissionais da área.\n        Para cada notícia selecionada, forneça:\n        1. O título original da notícia.\n        2. Um breve resumo (1-2 frases concisas) DO CONTEÚDO PRINCIPAL da notícia, elaborado por você.\n        3. Uma justificativa clara e concisa do porquê ela é impactante (ex: potencial de disrupção no mercado, avanço tecnológico significativo, implicações éticas amplas, grande número de desenvolvedores ou empresas afetadas, mudança de paradigma, etc.).\n\n        Priorize notícias com impacto direto e tangível. Evite notícias muito especulativas ou com baixo impacto prático imediato.\n        Se não houver ${topCount} notícias claramente impactantes, retorne menos de ${topCount}, mas apenas aquelas que realmente se destacam. Se nenhuma notícia for considerada impactante, retorne uma lista vazia.\n\n        A resposta DEVE ser um objeto JSON contendo uma única chave \"top_news\", que é um array de objetos. Cada objeto deve ter as chaves \"title\", \"summary\", e \"impact_reason\".\n        Exemplo de formato de saída:\n        {\n          \"top_news\": [\n            {\n              \"title\": \"Título da Notícia 1\",\n              \"summary\": \"Resumo elaborado da notícia 1.\",\n              \"impact_reason\": \"Justificativa do impacto da notícia 1.\"\n            }\n          ]\n        }\n    `;
   const messages = [
     { role: "system", content: systemPrompt },
     { role: "user", content: userPrompt }
@@ -46,7 +47,7 @@ export async function getTop5ImpactfulNews(newsItems) {
     const result = await callLLM(messages, { response_format: { type: "json_object" } });
     return result.top_news || [];
   } catch (error) {
-    logger.error("Erro ao obter as top 5 notícias da LLM:", error.message);
+    logger.error("Erro ao obter as top notícias da LLM:", error.message);
     return [];
   }
 }
