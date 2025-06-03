@@ -1,10 +1,12 @@
 # News Automation AI
-![Coverage](https://img.shields.io/badge/coverage-0%25-red.svg)
-
-![Build](https://img.shields.io/github/actions/workflow/status/thadeucbr/news/ci.yml?branch=main)
-![Tests](https://img.shields.io/badge/tests-PASS-brightgreen.svg)
 
 Automação de curadoria de notícias semanais sobre Inteligência Artificial e Desenvolvimento de Software, com geração de artigo para LinkedIn e roteiro para YouTube Short usando LLMs (OpenAI, Gemini, Ollama, etc).
+
+## Status do Projeto
+
+- Build, lint e testes automatizados via GitHub Actions (verifique a aba Actions do GitHub para status)
+- Cobertura de testes exibida no terminal após rodar `npm test -- --coverage`
+- Não há mais badges automáticos no README
 
 ## Requisitos
 
@@ -13,7 +15,7 @@ Automação de curadoria de notícias semanais sobre Inteligência Artificial e 
 
 ## Estrutura do Projeto
 
-```
+```text
 news/
 ├── index.js                # Ponto de entrada do app (manual ou agendado)
 ├── package.json            # Dependências e scripts
@@ -79,6 +81,7 @@ npm install
 ```
 
 ### Configuração
+
 Crie um arquivo `.env` na raiz com as variáveis necessárias (veja `.env.example`).
 
 ### Execução Manual
@@ -88,6 +91,7 @@ node index.js
 ```
 
 ### Execução Agendada (cron)
+
 Para ativar o agendamento automático, basta definir no seu `.env`:
 
 ```bash
@@ -106,7 +110,7 @@ LLM_PROVIDER=openai   # ou gemini, ollama
 
 - Para OpenAI: configure `OPENAI_API_KEY` e (opcional) `OPENAI_MODEL`.
 - Para Gemini: configure `GEMINI_API_KEY`.
-- Para Ollama: configure `OLLAMA_API_URL` (ex: http://localhost:11434/api/chat) e `OLLAMA_MODEL`.
+- Para Ollama: configure `OLLAMA_API_URL` (ex: <http://localhost:11434/api/chat>) e `OLLAMA_MODEL`.
 
 Para simular respostas sem custo, use a variável de ambiente `LLM_MOCK=1` ou `LLM_MOCK=true`. Assim, o sistema retorna respostas mockadas e não consome créditos de nenhum provedor.
 
@@ -160,6 +164,7 @@ Você pode customizar o local ou formato desses arquivos alterando o código em 
 - Totalmente ES Modules (import/export), aproveitando Node.js moderno.
 
 ## Licença
+
 MIT
 
 ---
