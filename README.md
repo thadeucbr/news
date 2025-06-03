@@ -1,5 +1,6 @@
 ![Tests](https://img.shields.io/badge/tests-PASS-brightgreen.svg)
 ![Tests](https://img.shields.io/badge/tests-PASS-brightgreen.svg)
+![Tests](https://img.shields.io/badge/tests-PASS-brightgreen.svg)
 
 # News Automation AI
 
