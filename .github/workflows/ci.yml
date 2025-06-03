@@ -38,7 +38,11 @@ jobs:
       - name: Get coverage percent
         id: coverage
         run: |
-          COVERAGE=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
+          if [ -f ./coverage/coverage-summary.json ]; then
+            COVERAGE=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
+          else
+            COVERAGE=0
+          fi
           echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
       - name: Update README coverage badge
         run: |
