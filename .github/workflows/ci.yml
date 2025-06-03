@@ -25,7 +25,8 @@ jobs:
         if: always()
         run: |
           STATUS=$(if [ $? -eq 0 ]; then echo "PASS"; else echo "FAIL"; fi)
-          sed -i '1s;^;![Tests](https://img.shields.io/badge/tests-'$STATUS'-'$([ "$STATUS" = "PASS" ] && echo "brightgreen" || echo "red")'.svg)\n;' README.md
+          sed -i '/^![Tests]/d' README.md
+          sed -i '1i \\[Tests](https://img.shields.io/badge/tests-'$STATUS'-'$([ "$STATUS" = "PASS" ] && echo "brightgreen" || echo "red")'.svg)' README.md
       - name: Commit badge if changed
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
