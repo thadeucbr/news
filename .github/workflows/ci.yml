@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
+      - name: Update README badge
+        if: always()
+        run: |
+          STATUS=$(if [ $? -eq 0 ]; then echo "PASS"; else echo "FAIL"; fi)
+          sed -i '1s;^;![Tests](https://img.shields.io/badge/tests-'$STATUS'-'$([ "$STATUS" = "PASS" ] && echo "brightgreen" || echo "red")'.svg)\n;' README.md
+      - name: Commit badge if changed
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          git diff --cached --quiet || git commit -m "ci: update test badge"
+          git push
