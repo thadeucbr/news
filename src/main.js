@@ -2,7 +2,7 @@
 // Orquestra o fluxo principal do app
 
 const { fetchWeeklyNews } = require('./services/newsService');
-const { getTop5ImpactfulNews, generateLinkedInArticle, generateYouTubeShortScript } = require('./services/openaiService');
+const { getTop5ImpactfulNews, generateLinkedInArticle, generateYouTubeShortScript } = require('./services/llmService');
 const { logger } = require('./utils/logger');
 
 async function main() {

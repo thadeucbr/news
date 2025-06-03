@@ -51,11 +51,34 @@ node index.js
 ```
 
 ### Execução Agendada (cron)
-Descomente a linha no `index.js`:
-```js
-// require('./src/scheduler');
+Para ativar o agendamento automático, basta definir no seu `.env`:
+
+```bash
+ENABLE_SCHEDULE=1
 ```
-O agendamento padrão é toda sexta-feira às 09:00 (fuso: America/Sao_Paulo).
+
+O agendamento padrão é toda sexta-feira às 09:00 (fuso: America/Sao_Paulo), mas pode ser customizado pelas variáveis `CRON_SCHEDULE` e `TIMEZONE`.
+
+## Suporte a múltiplos provedores de LLM
+
+O projeto suporta OpenAI, Gemini (Google) e Ollama. Para escolher o provedor, defina a variável de ambiente `LLM_PROVIDER`:
+
+```
+LLM_PROVIDER=openai   # ou gemini, ollama
+```
+
+- Para OpenAI: configure `OPENAI_API_KEY` e (opcional) `OPENAI_MODEL`.
+- Para Gemini: configure `GEMINI_API_KEY`.
+- Para Ollama: configure `OLLAMA_API_URL` (ex: http://localhost:11434/api/chat) e `OLLAMA_MODEL`.
+
+Para simular respostas sem custo, use a variável de ambiente `LLM_MOCK=1` ou `LLM_MOCK=true`. Assim, o sistema retorna respostas mockadas e não consome créditos de nenhum provedor.
+
+Exemplo no seu `.env`:
+```
+LLM_MOCK=1
+```
+
+Quando quiser usar respostas reais, basta remover ou comentar essa linha.
 
 ## Customização
 - Adicione novas fontes RSS em `src/services/newsService.js`.

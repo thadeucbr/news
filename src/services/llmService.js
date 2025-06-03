@@ -1,79 +1,36 @@
-// src/services/openaiService.js
-// Serviço para interagir com a API da OpenAI e gerar conteúdos
+// src/services/llmService.js
+// Serviço para interagir com qualquer LLM provider (OpenAI, Gemini, Ollama, etc)
 
-const axios = require('axios');
 const { logger } = require('../utils/logger');
+const { getProvider } = require('../providers/llmProviderFactory');
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-const OPENAI_MODEL = "gpt-4o-mini";
+function getMockedResponse(messages) {
+    if (messages.some(m => m.content.includes("identifique as 5 notícias mais impactantes"))) {
+        return {
+            top_news: [
+                { title: "Mock: IA Incrível", summary: "Nova IA faz maravilhas.", impact_reason: "Mercado em polvorosa." },
+                { title: "Mock: Dev Framework", summary: "Framework JS com novas features.", impact_reason: "Devs mais felizes." },
+            ]
+        };
+    } else if (messages.some(m => m.content.includes("escreva um artigo para o LinkedIn"))) {
+        return "## Artigo LinkedIn (Mock)\n\nAs notícias de IA são demais!\n...";
+    } else if (messages.some(m => m.content.includes("crie um roteiro para um YouTube Short"))) {
+        return "### Roteiro YouTube Short (Mock)\n\n**Intro:** NEWS!\n**Notícia 1:** IA Incrível!\n...";
+    }
+    return "Resposta mockada da LLM.";
+}
 
-async function callOpenAI_API(messages, jsonMode = false) {
-    if (!OPENAI_API_KEY) {
-        logger.warn("Chave da API da OpenAI (OPENAI_API_KEY) não configurada. Usando respostas mockadas.");
-        if (messages.some(m => m.content.includes("identifique as 5 notícias mais impactantes"))) {
-            return {
-                top_news: [
-                    { title: "OpenAI Mock: IA Incrível", summary: "Nova IA da OpenAI faz maravilhas.", impact_reason: "Mercado em polvorosa." },
-                    { title: "OpenAI Mock: Dev Framework", summary: "Framework JS com novas features.", impact_reason: "Devs mais felizes." },
-                ]
-            };
-        } else if (messages.some(m => m.content.includes("escreva um artigo para o LinkedIn"))) {
-            return "## Artigo LinkedIn (OpenAI Mock)\n\nAs notícias da OpenAI são demais!\n\n1. **OpenAI Mock: IA Incrível**: Fazendo coisas...\n...";
-        } else if (messages.some(m => m.content.includes("crie um roteiro para um YouTube Short"))) {
-            return "### Roteiro YouTube Short (OpenAI Mock)\n\n**Intro:** OpenAI NEWS!\n**Notícia 1:** IA Incrível da OpenAI!\n...";
-        }
-        return "Resposta mockada da OpenAI.";
+async function callLLM(messages, options = {}) {
+    const provider = getProvider();
+    if (process.env.LLM_MOCK === '1' || process.env.LLM_MOCK === 'true') {
+        logger.warn("LLM_MOCK ativado. Usando respostas mockadas.");
+        return getMockedResponse(messages);
     }
-    const payload = {
-        model: OPENAI_MODEL,
-        messages: messages,
-    };
-    if (jsonMode) {
-        payload.response_format = { type: "json_object" };
-    }
-    try {
-        const response = await axios.post(OPENAI_API_URL, payload, {
-            headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            timeout: 60000
-        });
-        if (response.data && response.data.choices && response.data.choices.length > 0) {
-            const messageContent = response.data.choices[0].message.content;
-            if (jsonMode) {
-                try {
-                    return JSON.parse(messageContent);
-                } catch (e) {
-                    logger.error("Erro ao parsear JSON da OpenAI:", e);
-                    logger.error("Resposta recebida (texto):", messageContent);
-                    throw new Error("Resposta da OpenAI não é um JSON válido, mesmo com json_object mode.");
-                }
-            }
-            return messageContent;
-        } else {
-            logger.error("Resposta inesperada da API OpenAI:", JSON.stringify(response.data, null, 2));
-            throw new Error("Estrutura de resposta inesperada da API OpenAI.");
-        }
-    } catch (error) {
-        if (error.response) {
-            logger.error("Erro ao chamar a API OpenAI:", error.response.status, error.response.data ? JSON.stringify(error.response.data) : 'No response data');
-        } else {
-            logger.error("Erro ao chamar a API OpenAI:", error.message);
-        }
-        if (error.response && error.response.status === 401) {
-            logger.error("Erro 401: Verifique sua OPENAI_API_KEY. Pode estar inválida ou sem créditos.");
-        }
-        if (error.response && error.response.status === 429) {
-            logger.error("Erro 429: Rate limit atingido na API da OpenAI. Tente novamente mais tarde ou verifique seus limites.");
-        }
-        throw error;
-    }
+    return provider.chat(messages, options);
 }
 
 async function getTop5ImpactfulNews(newsItems) {
-    logger.info("Analisando notícias com OpenAI para selecionar as mais impactantes...");
+    logger.info("Analisando notícias com LLM para selecionar as mais impactantes...");
     if (!newsItems || newsItems.length === 0) {
         logger.info("Nenhuma notícia fornecida para análise.");
         return [];
@@ -86,16 +43,16 @@ async function getTop5ImpactfulNews(newsItems) {
         { role: "user", content: userPrompt }
     ];
     try {
-        const result = await callOpenAI_API(messages, true);
+        const result = await callLLM(messages, { response_format: { type: "json_object" } });
         return result.top_news || [];
     } catch (error) {
-        logger.error("Erro ao obter as top 5 notícias da OpenAI:", error.message);
+        logger.error("Erro ao obter as top 5 notícias da LLM:", error.message);
         return [];
     }
 }
 
 async function generateLinkedInArticle(topNews) {
-    logger.info("Gerando artigo para o LinkedIn com OpenAI...");
+    logger.info("Gerando artigo para o LinkedIn com LLM...");
     if (!topNews || topNews.length === 0) {
         return "Não foi possível gerar o artigo do LinkedIn: nenhuma notícia impactante fornecida.";
     }
@@ -109,15 +66,15 @@ async function generateLinkedInArticle(topNews) {
         { role: "user", content: userPrompt }
     ];
     try {
-        return await callOpenAI_API(messages);
+        return await callLLM(messages);
     } catch (error) {
-        logger.error("Erro ao gerar artigo do LinkedIn com OpenAI:", error.message);
-        return "Erro ao gerar artigo do LinkedIn com OpenAI.";
+        logger.error("Erro ao gerar artigo do LinkedIn com LLM:", error.message);
+        return "Erro ao gerar artigo do LinkedIn com LLM.";
     }
 }
 
 async function generateYouTubeShortScript(topNews) {
-    logger.info("Gerando roteiro para YouTube Short com OpenAI...");
+    logger.info("Gerando roteiro para YouTube Short com LLM...");
     if (!topNews || topNews.length === 0) {
         return "Não foi possível gerar o roteiro do YouTube Short: nenhuma notícia impactante fornecida.";
     }
@@ -131,15 +88,15 @@ async function generateYouTubeShortScript(topNews) {
         { role: "user", content: userPrompt }
     ];
     try {
-        return await callOpenAI_API(messages);
+        return await callLLM(messages);
     } catch (error) {
-        logger.error("Erro ao gerar roteiro do YouTube Short com OpenAI:", error.message);
-        return "Erro ao gerar roteiro do YouTube Short com OpenAI.";
+        logger.error("Erro ao gerar roteiro do YouTube Short com LLM:", error.message);
+        return "Erro ao gerar roteiro do YouTube Short com LLM.";
     }
 }
 
 module.exports = {
-    callOpenAI_API,
+    callLLM,
     getTop5ImpactfulNews,
     generateLinkedInArticle,
     generateYouTubeShortScript

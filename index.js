@@ -3,15 +3,17 @@
 require('dotenv').config();
 
 const { main } = require('./src/main');
-// Para rodar manualmente:
-(async () => {
-    try {
-        await main();
-    } catch (error) {
-        console.error("Erro na execução principal manual:", error.message);
-    }
-})();
 
-// Para rodar agendado, basta importar:
-// require('./src/scheduler');
+if (process.env.ENABLE_SCHEDULE === '1' || process.env.ENABLE_SCHEDULE === 'true') {
+    require('./src/scheduler');
+} else {
+    // Execução manual
+    (async () => {
+        try {
+            await main();
+        } catch (error) {
+            console.error("Erro na execução principal manual:", error.message);
+        }
+    })();
+}
 
