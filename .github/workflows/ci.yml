@@ -46,9 +46,12 @@ jobs:
           echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
       - name: Update README coverage badge
         run: |
+          COVERAGE="${COVERAGE:-0}"
           sed -i '/^![Coverage]/Id' README.md
           sed -i "2i ![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-brightgreen.svg)" README.md
           cat README.md | head -10
+        env:
+          COVERAGE: ${{ env.COVERAGE }}
       - name: Commit badge if changed
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
