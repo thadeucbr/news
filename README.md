@@ -123,6 +123,15 @@ Para adicionar novos provedores, crie um arquivo em `src/providers/` seguindo o 
 - Adapte para salvar em arquivos, enviar por e-mail, etc.
 - Configure a quantidade de notícias impactantes com `TOP_NEWS_COUNT` no `.env`.
 
+## Output dos Conteúdos Gerados
+
+- O artigo do LinkedIn é salvo em `outputs/linkedin_<data>.md`.
+- O roteiro do YouTube Short é salvo em `outputs/youtube_short_<data>.txt`.
+
+Esses arquivos são gerados automaticamente a cada execução, facilitando o uso, publicação ou histórico dos conteúdos.
+
+Você pode customizar o local ou formato desses arquivos alterando o código em `src/main.js`.
+
 ## Boas Práticas
 
 - Código modular, fácil de manter e expandir.
