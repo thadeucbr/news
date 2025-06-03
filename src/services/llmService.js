@@ -45,7 +45,32 @@ export async function getTopImpactfulNews(newsItems) {
   ];
   try {
     const result = await callLLM(messages, { response_format: { type: "json_object" } });
-    return result.top_news || [];
+    let parsedResult = result;
+    // 1º parse se vier string JSON
+    if (typeof parsedResult === 'string') {
+      try {
+        parsedResult = JSON.parse(parsedResult);
+      } catch (e) {
+        logger.error('[DEBUG] Falha ao fazer parse do JSON retornado pela LLM:', e, result);
+        return [];
+      }
+    }
+    // 2º parse se top_news vier como string JSON
+    if (parsedResult && typeof parsedResult.top_news === 'string') {
+      try {
+        parsedResult.top_news = JSON.parse(parsedResult.top_news);
+      } catch (e) {
+        logger.error('[DEBUG] Falha ao fazer parse do campo top_news:', e, parsedResult.top_news);
+        return [];
+      }
+    }
+    logger.info('[DEBUG] Resposta bruta da LLM:', JSON.stringify(parsedResult));
+    if (Array.isArray(parsedResult.top_news)) {
+      return parsedResult.top_news;
+    } else {
+      logger.error('[DEBUG] top_news não é um array:', parsedResult.top_news);
+      return [];
+    }
   } catch (error) {
     logger.error("Erro ao obter as top notícias da LLM:", error.message);
     return [];
