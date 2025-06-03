@@ -1,4 +1,5 @@
 # News Automation AI
+![Coverage](https://img.shields.io/badge/coverage-0%25-brightgreen.svg)
 
 ![Build](https://img.shields.io/github/actions/workflow/status/thadeucbr/news/ci.yml?branch=main)
 ![Coverage](https://img.shields.io/codecov/c/github/thadeucbr/news?token=)
