@@ -11,17 +11,34 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x]
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Use Node.js 22
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Install dependencies
         run: npm install
-      - name: Run build (checa se o projeto builda sem erros)
+      - name: Lint (se disponível)
+        run: |
+          if [ -f .eslintrc.js ] || [ -f .eslintrc.json ] || [ -f .eslintrc ]; then
+            npx eslint .
+          else
+            echo 'No ESLint config found, skipping lint.'
+          fi
+      - name: Run build (checa sintaxe dos arquivos principais)
         run: |
           node --check index.js
           node --check src/main.js
@@ -33,9 +50,9 @@ jobs:
           node --check src/providers/openaiProvider.js
           node --check src/providers/geminiProvider.js
           node --check src/providers/ollamaProvider.js
-      - name: Run tests
+      - name: Run tests (Jest + coverage)
         run: npm test -- --coverage
-      - name: Get coverage percent
+      - name: Get coverage percent and badge color
         id: coverage
         run: |
           if [ -f ./coverage/coverage-summary.json ]; then
@@ -43,7 +60,6 @@ jobs:
           else
             COVERAGE=0
           fi
-          # Define cor do badge
           if [ "$COVERAGE" -ge 80 ]; then
             BADGE_COLOR=brightgreen
           elif [ "$COVERAGE" -ge 50 ]; then
@@ -55,9 +71,7 @@ jobs:
           echo "BADGE_COLOR=$BADGE_COLOR" >> $GITHUB_ENV
       - name: Update README coverage badge
         run: |
-          # Remove todas as linhas com badge de coverage
           sed -i '/coverage-.*%25-.*\.svg)/Id' README.md
-          # Adiciona na segunda linha
           sed -i "2i ![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${BADGE_COLOR}.svg)" README.md
           head -10 README.md
         env:
@@ -70,5 +84,5 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add README.md
-          git diff --cached --quiet || git commit -m "ci: update test badge"
+          git diff --cached --quiet || git commit -m "ci: update coverage badge"
           git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
