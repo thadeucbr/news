@@ -45,16 +45,27 @@ export async function main() {
         };
         await markNewsAsUsed(newsToSave);
     }
+    // Lê flags do .env
+    const generateLinkedin = process.env.GENERATE_LINKEDIN !== 'false';
+    const generateYoutubeShort = process.env.GENERATE_YOUTUBE_SHORT !== 'false';
     // Salva outputs em arquivos
     const outDir = path.resolve(process.cwd(), 'outputs');
     await fs.mkdir(outDir, { recursive: true });
-    const linkedInArticle = await generateLinkedInArticle(topNews);
-    const linkedInPath = path.join(outDir, `linkedin_${new Date().toISOString().slice(0,10)}.md`);
-    await fs.writeFile(linkedInPath, linkedInArticle);
-    logger.info(`Artigo do LinkedIn salvo em: ${linkedInPath}`);
-    const youtubeShortScript = await generateYouTubeShortScript(topNews);
-    const ytPath = path.join(outDir, `youtube_short_${new Date().toISOString().slice(0,10)}.txt`);
-    await fs.writeFile(ytPath, youtubeShortScript);
-    logger.info(`Roteiro do YouTube Short salvo em: ${ytPath}`);
+    if (generateLinkedin) {
+        const linkedInArticle = await generateLinkedInArticle(topNews);
+        const linkedInPath = path.join(outDir, `linkedin_${new Date().toISOString().slice(0,10)}.md`);
+        await fs.writeFile(linkedInPath, linkedInArticle);
+        logger.info(`Artigo do LinkedIn salvo em: ${linkedInPath}`);
+    } else {
+        logger.info('Geração de artigo para LinkedIn desativada por configuração.');
+    }
+    if (generateYoutubeShort) {
+        const youtubeShortScript = await generateYouTubeShortScript(topNews);
+        const ytPath = path.join(outDir, `youtube_short_${new Date().toISOString().slice(0,10)}.txt`);
+        await fs.writeFile(ytPath, youtubeShortScript);
+        logger.info(`Roteiro do YouTube Short salvo em: ${ytPath}`);
+    } else {
+        logger.info('Geração de roteiro para YouTube Short desativada por configuração.');
+    }
     logger.info("\nProcesso concluído!");
 }

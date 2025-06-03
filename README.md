@@ -123,6 +123,22 @@ Para adicionar novos provedores, crie um arquivo em `src/providers/` seguindo o 
 - Adapte para salvar em arquivos, enviar por e-mail, etc.
 - Configure a quantidade de notícias impactantes com `TOP_NEWS_COUNT` no `.env`.
 
+## Como gerar apenas LinkedIn ou YouTube Short
+
+Você pode controlar o que será gerado usando as variáveis no `.env`:
+
+```env
+# Geração de conteúdos (defina como true ou false)
+GENERATE_LINKEDIN=true         # Gera artigo para LinkedIn (default: true)
+GENERATE_YOUTUBE_SHORT=true    # Gera roteiro para YouTube Short (default: true)
+```
+
+- Para gerar apenas o LinkedIn: coloque `GENERATE_LINKEDIN=true` e `GENERATE_YOUTUBE_SHORT=false`.
+- Para gerar apenas o YouTube Short: coloque `GENERATE_LINKEDIN=false` e `GENERATE_YOUTUBE_SHORT=true`.
+- Para gerar ambos, deixe ambos como `true` (ou remova, pois o padrão é gerar ambos).
+
+Se ambos estiverem como `false`, nada será gerado.
+
 ## Output dos Conteúdos Gerados
 
 - O artigo do LinkedIn é salvo em `outputs/linkedin_<data>.md`.
