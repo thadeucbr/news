@@ -1,7 +1,7 @@
 // src/providers/llmProviderFactory.js
-const openai = require('./openaiProvider');
-const gemini = require('./geminiProvider');
-const ollama = require('./ollamaProvider');
+import * as openai from './openaiProvider.js';
+import * as gemini from './geminiProvider.js';
+import * as ollama from './ollamaProvider.js';
 
 const providers = {
     openai,
@@ -9,10 +9,8 @@ const providers = {
     ollama
 };
 
-function getProvider() {
+export function getProvider() {
     const name = (process.env.LLM_PROVIDER || 'openai').toLowerCase();
     if (!providers[name]) throw new Error(`LLM provider '${name}' não suportado.`);
     return providers[name];
 }
-
-module.exports = { getProvider };

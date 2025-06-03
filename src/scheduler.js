@@ -1,9 +1,9 @@
 // src/scheduler.js
 // Configuração do agendamento (cron)
 
-const cron = require('node-cron');
-const { main } = require('./main');
-const { logger } = require('./utils/logger');
+import cron from 'node-cron';
+import { main } from './main.js';
+import { logger } from './utils/logger.js';
 
 const cronSchedule = process.env.CRON_SCHEDULE || '0 9 * * 5'; // Sexta-feira às 09:00
 const timezone = process.env.TIMEZONE || 'America/Sao_Paulo';

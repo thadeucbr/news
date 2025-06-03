@@ -1,10 +1,10 @@
 // src/providers/ollamaProvider.js
-const axios = require('axios');
+import axios from 'axios';
 
 const OLLAMA_API_URL = process.env.OLLAMA_API_URL || "http://localhost:11434/api/chat";
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3";
 
-async function chat(messages, options = {}) {
+export async function chat(messages, options = {}) {
     // Ollama espera um array de mensagens, mas o formato é diferente
     const payload = {
         model: OLLAMA_MODEL,
@@ -19,4 +19,4 @@ async function chat(messages, options = {}) {
     return response.data.message.content;
 }
 
-module.exports = { chat, name: 'ollama' };
+export const name = 'ollama';

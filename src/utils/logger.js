@@ -1,15 +1,14 @@
 // src/utils/logger.js
 // Logger simples para padronizar logs
 
-function info(...args) {
+export function info(...args) {
     console.log('[INFO]', ...args);
 }
-function warn(...args) {
+export function warn(...args) {
     console.warn('[WARN]', ...args);
 }
-function error(...args) {
+export function error(...args) {
     console.error('[ERROR]', ...args);
 }
 
-const logger = { info, warn, error };
-module.exports = { logger };
+export const logger = { info, warn, error };

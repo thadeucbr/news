@@ -1,12 +1,9 @@
-// src/main.js
-// Orquestra o fluxo principal do app
+import { fetchWeeklyNews } from './services/newsService.js';
+import { getTop5ImpactfulNews, generateLinkedInArticle, generateYouTubeShortScript } from './services/llmService.js';
+import { logger } from './utils/logger.js';
 
-const { fetchWeeklyNews } = require('./services/newsService');
-const { getTop5ImpactfulNews, generateLinkedInArticle, generateYouTubeShortScript } = require('./services/llmService');
-const { logger } = require('./utils/logger');
-
-async function main() {
-    logger.info("Iniciando processo de automação de notícias com OpenAI...");
+export async function main() {
+    logger.info("Iniciando processo de automação de notícias com LLM...");
     const newsItems = await fetchWeeklyNews();
     if (!newsItems || newsItems.length === 0) {
         logger.info("Nenhuma notícia encontrada na última semana. Encerrando.");
@@ -18,17 +15,15 @@ async function main() {
         logger.info("Não foi possível identificar notícias impactantes ou a IA não retornou resultados. Encerrando geração de conteúdo.");
         return;
     }
-    logger.info(`\n\n--- Top ${topNews.length} Notícias Mais Impactantes (Analisadas pela OpenAI) ---`);
+    logger.info(`\n\n--- Top ${topNews.length} Notícias Mais Impactantes (Analisadas pela LLM) ---`);
     topNews.forEach(news => {
         logger.info(`Título: ${news.title}\nResumo IA: ${news.summary}\nImpacto IA: ${news.impact_reason}\n---`);
     });
     const linkedInArticle = await generateLinkedInArticle(topNews);
-    logger.info("\n\n--- Artigo para LinkedIn (Gerado pela OpenAI) ---");
+    logger.info("\n\n--- Artigo para LinkedIn (Gerado pela LLM) ---");
     logger.info(linkedInArticle);
     const youtubeShortScript = await generateYouTubeShortScript(topNews);
-    logger.info("\n\n--- Roteiro para YouTube Short (Gerado pela OpenAI) ---");
+    logger.info("\n\n--- Roteiro para YouTube Short (Gerado pela LLM) ---");
     logger.info(youtubeShortScript);
     logger.info("\nProcesso concluído!");
 }
-
-module.exports = { main };

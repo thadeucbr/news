@@ -1,11 +1,11 @@
 // src/services/newsService.js
 // Serviço para buscar e processar notícias de fontes RSS
 
-const axios = require('axios');
-const { parseStringPromise } = require('xml2js');
-const { logger } = require('../utils/logger');
+import axios from 'axios';
+import { parseStringPromise } from 'xml2js';
+import { logger } from '../utils/logger.js';
 
-async function fetchWeeklyNews() {
+export async function fetchWeeklyNews() {
     logger.info("Buscando notícias da semana de fontes reais...");
     let allNews = [];
     const oneWeekAgo = new Date();
@@ -114,7 +114,3 @@ async function fetchWeeklyNews() {
     logger.info(`Total de ${uniqueNews.length} notícias únicas encontradas na última semana.`);
     return uniqueNews;
 }
-
-module.exports = {
-    fetchWeeklyNews
-};
