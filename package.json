@@ -33,6 +33,7 @@
     "@babel/core": "^7.27.4",
     "@babel/preset-env": "^7.27.2",
     "@babel/register": "^7.27.1",
+    "codecov": "^3.8.2",
     "jest": "^29.7.0"
   }
 }

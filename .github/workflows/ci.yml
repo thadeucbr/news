@@ -21,14 +21,29 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
-      - name: Run tests
-        run: npm test
-      - name: Update README badge
-        if: always()
+      - name: Run build (checa se o projeto builda sem erros)
         run: |
-          STATUS=$(if [ $? -eq 0 ]; then echo "PASS"; else echo "FAIL"; fi)
-          sed -i '/^![Tests]/d' README.md
-          sed -i '1i \\[Tests](https://img.shields.io/badge/tests-'$STATUS'-'$([ "$STATUS" = "PASS" ] && echo "brightgreen" || echo "red")'.svg)' README.md
+          node --check index.js
+          node --check src/main.js
+          node --check src/services/llmService.js
+          node --check src/services/newsService.js
+          node --check src/utils/persistence.js
+          node --check src/utils/logger.js
+          node --check src/providers/llmProviderFactory.js
+          node --check src/providers/openaiProvider.js
+          node --check src/providers/geminiProvider.js
+          node --check src/providers/ollamaProvider.js
+      - name: Run tests
+        run: npm test -- --coverage
+      - name: Get coverage percent
+        id: coverage
+        run: |
+          COVERAGE=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
+          echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+      - name: Update README coverage badge
+        run: |
+          sed -i '/^![Coverage]/d' README.md
+          sed -i "2i ![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-brightgreen.svg)" README.md
       - name: Commit badge if changed
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
